@@ -11,7 +11,6 @@ struct Tnode{
 struct Tnode* buildTree(int L[], int R[], int n);
 struct Tnode* buildSubTree(int L[], int R[], int i);
 int isChild(struct Tnode *root, int child, int parent);
-void printTree(struct Tnode *root);
 int main(){
     int L[100];
     int R[100];
