@@ -185,8 +185,8 @@ void initgraph(ALGraph *G)
     {
         case 1:
             createcityfile();   //创建城市文件 
-            createfile(1);  //创建航班文件 
-            createfile(2);  //创建列车文件 
+            createfile(1);      //创建航班文件 
+            createfile(2);      //创建列车文件 
             CreateGraph(G);     //初始化交通系统
             break;
         case 2:
@@ -217,7 +217,7 @@ void createcityfile()
         return;
     }
     for(j = 0; j < i; j++)
-        fprintf(fp, "%s", city[j]);
+        fprintf(fp, "%s \n", city[j]);
     fclose(fp);
 }
 
@@ -356,8 +356,9 @@ void CreateGraph(ALGraph *G)
         j++;
     }
     G->vexnum = i;
+
     //打开plane.txt文档 
-    if((fp = fopen("plane.txt", "rb")) == NULL)
+    if((fp = fopen("plane.txt", "r")) == NULL)
         printf("cannot open the file!\n");
     fscanf(fp, "%d", &count1);
     //将文档中的内容读取到数组a中 
@@ -371,6 +372,7 @@ void CreateGraph(ALGraph *G)
     //绘制飞机航线图 
     while(k < count1)
     {
+        printf("%s %s %s %f %d:%d %d:%d\n", a[k].id, a[k].StartCity, a[k].EndCity, a[k].price, a[k].BeginTime[0], a[k].BeginTime[1], a[k].ArriveTime[0], a[k].ArriveTime[1]);
         i = LocateVertex(G, a[k].StartCity); //调用函数 LocateVertex(G,a[k].StartCity)得到起始结点的位置 i
         j = LocateVertex(G, a[k].EndCity); //调用函数 LocateVertex(G,a[k].EndCity)得到起始结点的位置 j
         if(i == -1)
@@ -421,7 +423,7 @@ void CreateGraph(ALGraph *G)
     }
     G->planearcnum = arc_num;
     //打开train.txt文档 
-    if((fp = fopen("train.txt","rb")) == NULL)
+    if((fp = fopen("train.txt","r")) == NULL)
     {
         printf("cannot open the file!\n");
         return ;
@@ -507,7 +509,7 @@ int save(ALGraph *G)
     }
     i = 0;
     //打开city.txt文档 
-    if((fp = fopen("city.txt", "wb")) == NULL)
+    if((fp = fopen("city.txt", "w")) == NULL)
         printf("cannot open the file\n");
     //将数组city中的信息存储到文件city中 
     while(i < G->vexnum)
@@ -540,7 +542,7 @@ int save(ALGraph *G)
         }
     }
     //打开plane.txt文件 
-    if((fp = fopen("plane.txt", "wb")) == NULL)
+    if((fp = fopen("plane.txt", "w")) == NULL)
     {
         printf("cannot open the file\n");
         return -1;
@@ -579,7 +581,7 @@ int save(ALGraph *G)
         }
     }
     //打开train.txt文件 
-    if((fp = fopen("train.txt","wb")) == NULL)
+    if((fp = fopen("train.txt","w")) == NULL)
     {
         printf("cannot open the file\n");
         return -1;
