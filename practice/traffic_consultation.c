@@ -318,9 +318,8 @@ int LocateVertex(ALGraph *G,char *v)
             j = k;    //记录位置
             break;
         }
-        printf("无法找到该城市！\n");
-        return j;
     }
+    return j;
 }
 
 //用city，plan，train三个文档创建城市交通系统
@@ -329,19 +328,25 @@ void CreateGraph(ALGraph *G)
     int i = 0, j = 0, k = 0, arc_num = 0, count1, count2, m, t;
     ArcNode *p,*q;
     FILE *fp;
-    //打开city.txt文档 
-    if((fp = fopen("city.txt", "rb")) == NULL)
-    {
-        printf("\ncannot open the file!\n");
+    
+    // 打开city.txt文档
+    if ((fp = fopen("city.txt", "r")) == NULL) {
+        printf("\n无法打开文件city.txt!\n");
         return;
     }
-    //读取city文档中的内容到数组中 
-    while(!feof(fp))
-    {
-        fscanf(fp, "%10s", city[i]);
-        i++;
+    // 读取city文档中的内容到数组中
+    char line[256]; // 假设一行不超过255个字符
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        if (sscanf(line, "%15s", city[i]) == 1) {
+            i++;
+            if (i >= MAX_VERTEX_NUM) {
+                printf("\n警告：达到城市数量上限。\n");
+                break;
+            }
+        }
     }
     fclose(fp);
+
     //把读取的数据存放到图G中
     while(j < i)
     {
@@ -368,6 +373,16 @@ void CreateGraph(ALGraph *G)
     {
         i = LocateVertex(G, a[k].StartCity); //调用函数 LocateVertex(G,a[k].StartCity)得到起始结点的位置 i
         j = LocateVertex(G, a[k].EndCity); //调用函数 LocateVertex(G,a[k].EndCity)得到起始结点的位置 j
+        if(i == -1)
+        {
+            printf("错误！无法找到起始城市\n");
+            return;
+        }
+        if(j == -1)
+        {
+            printf("错误！无法找到到达城市\n");
+            return;
+        }
         q = G->vertices[i].planefirstarc;
         m = 0;
         while(q != NULL)
@@ -428,6 +443,16 @@ void CreateGraph(ALGraph *G)
     {
         i = LocateVertex(G,a[k].StartCity);  // 调用函数 LocateVertex(G,a[k].StartCity)得到起始结点的位置 i
         j = LocateVertex(G,a[k].EndCity);  // 调用函数 LocateVertex(G,a[k].EndCity)得到起始结点的位置 j
+        if(i == -1)
+        {
+            printf("错误！无法找到起始城市\n");
+            return;
+        }
+        if(j == -1)
+        {
+            printf("错误！无法找到到达城市\n");
+            return;
+        }
         q = G->vertices[i].trainfirstarc;
         m = 0;
         while(q != NULL)
