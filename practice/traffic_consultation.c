@@ -294,16 +294,19 @@ void createfile(int flag_choose)
     //打开文件
     if (flag_choose == 1)
         fp = fopen("plane.txt","w");
-    if (flag_choose == 2)
+    else if (flag_choose == 2)
         fp = fopen("train.txt","w");
     if(fp == NULL) 
         printf("\n无法打开相应文件！\n");
     fprintf(fp,"%d",count);    //将计数值count写入航班车文件
     //写入文件 
     for(i = 0; i < count; i++)
-        if(fwrite(&a[i], sizeof(struct arc), 1, fp) != 1)
+        if(fwrite(&a[i], sizeof(struct arc), 1, fp) != 1){
             printf("File write error!\n");
+            break; //写入失败，退出循环
+        }
     fclose(fp);
+    return;
 }
 
 
@@ -361,18 +364,19 @@ void CreateGraph(ALGraph *G)
     if((fp = fopen("plane.txt", "r")) == NULL)
         printf("cannot open the file!\n");
     fscanf(fp, "%d", &count1);
+    printf("count1 = %d\n", count1);
     //将文档中的内容读取到数组a中 
     while(k < count1)
     {
         if(fread(&a[k], sizeof(struct arc), 1, fp) != 1)
-            printf("file write error!\n");
+            printf("file open error!\n");
+        printf("%s %s %s %f %d:%d %d:%d\n", a[k].id, a[k].StartCity, a[k].EndCity, a[k].price, a[k].BeginTime[0], a[k].BeginTime[1], a[k].ArriveTime[0], a[k].ArriveTime[1]);
         k++;
     }
     fclose(fp);
     //绘制飞机航线图 
     while(k < count1)
     {
-        printf("%s %s %s %f %d:%d %d:%d\n", a[k].id, a[k].StartCity, a[k].EndCity, a[k].price, a[k].BeginTime[0], a[k].BeginTime[1], a[k].ArriveTime[0], a[k].ArriveTime[1]);
         i = LocateVertex(G, a[k].StartCity); //调用函数 LocateVertex(G,a[k].StartCity)得到起始结点的位置 i
         j = LocateVertex(G, a[k].EndCity); //调用函数 LocateVertex(G,a[k].EndCity)得到起始结点的位置 j
         if(i == -1)
@@ -430,11 +434,13 @@ void CreateGraph(ALGraph *G)
     }
     k = 0;
     fscanf(fp, "%d", &count2);
+    printf("count2 = %d\n", count2);
     //将文件中的信息存入数组a中 
     while(k < count2)
     {
         if(fread(&a[k], sizeof(struct arc), 1, fp) != 1)
-            printf("file write error!\n");
+            printf("file open error!\n");
+        printf("%s %s %s %f %d:%d %d:%d\n", a[k].id, a[k].StartCity, a[k].EndCity, a[k].price, a[k].BeginTime[0], a[k].BeginTime[1], a[k].ArriveTime[0], a[k].ArriveTime[1]);
         k++;
     }
     fclose(fp);
