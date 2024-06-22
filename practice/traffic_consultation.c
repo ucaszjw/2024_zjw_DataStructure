@@ -362,18 +362,20 @@ void CreateGraph(ALGraph *G)
 
     //打开plane.txt文档 
     if((fp = fopen("plane.txt", "r")) == NULL)
+    {
         printf("cannot open the file!\n");
+        return;
+    }
     fscanf(fp, "%d", &count1);
-    printf("count1 = %d\n", count1);
     //将文档中的内容读取到数组a中 
     while(k < count1)
     {
         if(fread(&a[k], sizeof(struct arc), 1, fp) != 1)
             printf("file open error!\n");
-        printf("%s %s %s %f %d:%d %d:%d\n", a[k].id, a[k].StartCity, a[k].EndCity, a[k].price, a[k].BeginTime[0], a[k].BeginTime[1], a[k].ArriveTime[0], a[k].ArriveTime[1]);
         k++;
     }
     fclose(fp);
+    k = 0;
     //绘制飞机航线图 
     while(k < count1)
     {
@@ -421,26 +423,24 @@ void CreateGraph(ALGraph *G)
             p->info.last = 0;
             p->nextarc = G->vertices[i].planefirstarc;
             G->vertices[i].planefirstarc = p;  // 将弧结点连接到适当的位置中去
-            arc_num ++;
+            arc_num++;
         }
-        k ++;
+        k++;
     }
     G->planearcnum = arc_num;
     //打开train.txt文档 
     if((fp = fopen("train.txt","r")) == NULL)
     {
         printf("cannot open the file!\n");
-        return ;
+        return;
     }
     k = 0;
     fscanf(fp, "%d", &count2);
-    printf("count2 = %d\n", count2);
     //将文件中的信息存入数组a中 
     while(k < count2)
     {
         if(fread(&a[k], sizeof(struct arc), 1, fp) != 1)
             printf("file open error!\n");
-        printf("%s %s %s %f %d:%d %d:%d\n", a[k].id, a[k].StartCity, a[k].EndCity, a[k].price, a[k].BeginTime[0], a[k].BeginTime[1], a[k].ArriveTime[0], a[k].ArriveTime[1]);
         k++;
     }
     fclose(fp);
@@ -933,9 +933,9 @@ void ExpenditureDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int 
             while(r != NULL)
             {
                 if(k == 1)
-                    printf("乘坐%s列车车次在%d:%d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                    printf("乘坐%s列车车次在%02d:%2d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
                 else
-                    printf("乘坐%s飞机航班在%d:%d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                    printf("乘坐%s飞机航班在%02d:%2d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
                 
                 q = r;
                 r = r->next;
@@ -1095,9 +1095,9 @@ void TransferDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0,
                     while(r != NULL)
                     {
                         if(k == 1)
-                            printf("乘坐%s列车车次在%d:%d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
+                            printf("乘坐%s列车车次在%02d:%2d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
                         else
-                            printf("乘坐%s飞机航班在%d:%d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
+                            printf("乘坐%s飞机航班在%02d:%2d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
                         q = r;
                         r = r->next;
                         n++;
@@ -1218,7 +1218,7 @@ void PrintGraph(ALGraph *G)
                     {
                         printf("%s---->%s\n", G->vertices[j].cityname, G->vertices[q->adjvex].cityname);
                         for(k = 0; k <= q->info.last; k++)
-                            printf("     航班编号:%s  费用:%5.2f 起飞时间:%d:%d  到达时间:%d:%d\n", q->info.stata[k].number, q->info.stata[k].expenditure, q->info.stata[k].begintime[0], q->info.stata[k].begintime[1], q->info.stata[k].arrivetime[0], q->info.stata[k].arrivetime[1]);
+                            printf("     航班编号:%s  费用:%5.2f 起飞时间:%02d:%02d  到达时间:%02d:%02d\n", q->info.stata[k].number, q->info.stata[k].expenditure, q->info.stata[k].begintime[0], q->info.stata[k].begintime[1], q->info.stata[k].arrivetime[0], q->info.stata[k].arrivetime[1]);
                         q = q->nextarc;
                     }
                 }
@@ -1232,7 +1232,7 @@ void PrintGraph(ALGraph *G)
                     {
                         printf("%s---->%s\n", G->vertices[j].cityname, G->vertices[q->adjvex].cityname);
                         for(k = 0; k <= q->info.last; k++)
-                            printf("    车次编号:%s  费用:%5.2f 起飞时间:%d:%d  到达时间:%d:%d\n", q->info.stata[k].number, q->info.stata[k].expenditure, q->info.stata[k].begintime[0], q->info.stata[k].begintime[1], q->info.stata[k].arrivetime[0], q->info.stata[k].arrivetime[1]);
+                            printf("    车次编号:%s  费用:%5.2f 起飞时间:%02d:%02d  到达时间:%02d:%02d\n", q->info.stata[k].number, q->info.stata[k].expenditure, q->info.stata[k].begintime[0], q->info.stata[k].begintime[1], q->info.stata[k].arrivetime[0], q->info.stata[k].arrivetime[1]);
                         q = q->nextarc;
                     }
                 }
