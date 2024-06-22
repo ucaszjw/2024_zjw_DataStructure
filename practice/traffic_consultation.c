@@ -786,7 +786,7 @@ void UserDemand(ALGraph G)
         scanf("%c", &q);
         scanf("%c", &q);
         printf("-------------------------------------------------------\n"); 
-        printf("|      1=最少行程费用              2=最少行程时间     |\n");
+        printf("|      1=最少行程费用              2=最少中转次数     |\n");
         printf("|      3=返回上一级菜单                               |\n");
         printf("-------------------------------------------------------\n");
         printf("请选择咨询项目:");
@@ -1232,7 +1232,7 @@ void PrintGraph(ALGraph *G)
                     {
                         printf("%s---->%s\n", G->vertices[j].cityname, G->vertices[q->adjvex].cityname);
                         for(k = 0; k <= q->info.last; k++)
-                            printf("    车次编号:%s  费用:%5.2f 起飞时间:%02d:%02d  到达时间:%02d:%02d\n", q->info.stata[k].number, q->info.stata[k].expenditure, q->info.stata[k].begintime[0], q->info.stata[k].begintime[1], q->info.stata[k].arrivetime[0], q->info.stata[k].arrivetime[1]);
+                            printf("    车次编号:%s  费用:%5.2f 出发时间:%02d:%02d  到达时间:%02d:%02d\n", q->info.stata[k].number, q->info.stata[k].expenditure, q->info.stata[k].begintime[0], q->info.stata[k].begintime[1], q->info.stata[k].arrivetime[0], q->info.stata[k].arrivetime[1]);
                         q = q->nextarc;
                     }
                 }
