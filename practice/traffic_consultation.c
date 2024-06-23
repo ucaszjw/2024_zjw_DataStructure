@@ -9,7 +9,7 @@
 #define MAX_TRANSPORT_ID_LEN 6
 #define False 0
 #define True 1
-#define INFINITY 10000
+#define INFINITY 10000000
 
 struct arc
 {
@@ -96,6 +96,9 @@ int IsEmpty(LinkQueue *Q); //队列判空操作
 void TransferDispose(int k,infolist (*arcs)[MAX_VERTEX_NUM],ALGraph G,int v0,int v1); //最少中转次数 
 
 void PrintGraph(ALGraph *G); //显示城市交通系统
+
+void TimeDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0, int v1, float *M, int *final, int T[MAX_VERTEX_NUM][2]);
+void MinTime(infolist arcs, float *time, int *route);
 
 //显示程序功能选择界面
 int main()
@@ -770,24 +773,25 @@ void UserDemand(ALGraph G)
     printf("咨询项目如下所示:\n");
     printf("-------------------------------------------------------\n"); 
     printf("|      1=最少行程费用              2=最少中转次数     |\n");
-    printf("|      3=返回上一级菜单                               |\n");
+    printf("|      3=最短行程时间              4=返回上一级菜单   |\n");
     printf("-------------------------------------------------------\n");
     printf("请选择咨询项目: ");
     scanf("%d",&i);
     getchar();
-    while(i != 3)
+    while(i != 4)
     {
         switch(i)
         {
             case 1: DemandDispose(1, G); break;  //最少费用 
             case 2: DemandDispose(2, G); break;   //最少中转 
+            case 3: DemandDispose(3, G); break;   //最短时间
         }
         printf("按回车继续\n");
         scanf("%c", &q);
         scanf("%c", &q);
         printf("-------------------------------------------------------\n"); 
         printf("|      1=最少行程费用              2=最少中转次数     |\n");
-        printf("|      3=返回上一级菜单                               |\n");
+        printf("|      3=最短行程时间              4=返回上一级菜单   |\n");
         printf("-------------------------------------------------------\n");
         printf("请选择咨询项目:");
         scanf("%d", &i);
@@ -869,6 +873,11 @@ void DemandDispose(int n, ALGraph G)
             ExpenditureDispose(2, planearcs, G, i, j, M, final);
         else if(k == 2 && n == 2)  //飞机最少中转 
             TransferDispose(2,planearcs,G,i,j); 
+        else if(k == 1 && n == 3)
+            TimeDispose(1, trainarcs, G, i, j, M, final, T);
+        else if(k == 2 && n == 3)
+            TimeDispose(2, planearcs, G, i, j, M, final, T);
+
     }
     //若不查询，则重新显示用户咨询界面 
     else if(q == 'N' || q == 'n')
@@ -933,9 +942,9 @@ void ExpenditureDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int 
             while(r != NULL)
             {
                 if(k == 1)
-                    printf("乘坐%s列车车次在%02d:%2d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                    printf("乘坐%s列车车次在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
                 else
-                    printf("乘坐%s飞机航班在%02d:%2d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                    printf("乘坐%s飞机航班在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
                 
                 q = r;
                 r = r->next;
@@ -1095,9 +1104,9 @@ void TransferDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0,
                     while(r != NULL)
                     {
                         if(k == 1)
-                            printf("乘坐%s列车车次在%02d:%2d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
+                            printf("乘坐%s列车车次在%02d:%02d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
                         else
-                            printf("乘坐%s飞机航班在%02d:%2d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
+                            printf("乘坐%s飞机航班在%02d:%02d从%s到%s\n",(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].number,(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[0],(*(*(arcs+q->adjvex)+r->adjvex)).stata[0].begintime[1],G.vertices[q->adjvex].cityname,G.vertices[r->adjvex].cityname);
                         q = r;
                         r = r->next;
                         n++;
@@ -1247,3 +1256,404 @@ void PrintGraph(ALGraph *G)
         getchar();
     }
 }
+
+void MinTime(infolist arcs, float *time, int *route) {
+    int i;
+    *time = arcs.stata[0].arrivetime[0] * 60 + arcs.stata[0].arrivetime[1] - arcs.stata[0].begintime[0] * 60 - arcs.stata[0].begintime[1];
+
+    if (*time < INFINITY) 
+        *route = 0;
+    else
+        *route = -1;
+
+    for (i = 1; i <= arcs.last; i++) {
+        if (arcs.stata[i].arrivetime[0] * 60 + arcs.stata[i].arrivetime[1] - arcs.stata[i].begintime[0] * 60 - arcs.stata[i].begintime[1] < *time) {
+            *time = arcs.stata[i].arrivetime[0] * 60 + arcs.stata[i].arrivetime[1] - arcs.stata[i].begintime[0] * 60 - arcs.stata[i].begintime[1];
+            *route = i;
+        }
+    }
+}
+
+void TimeDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0, int v1, float *M, int *final, int T[MAX_VERTEX_NUM][2]) {
+    int v = -1, w, i, route;
+    float m, time;
+    Node *p, *q, *r, *s;
+    p = (Node *)malloc(G.vexnum * sizeof(Node));
+    for (v = 0; v < G.vexnum; v++) {
+        final[v] = False;
+        MinTime(arcs[v0][v], &M[v], &route);
+        p[v].next = NULL;
+        if (M[v] < INFINITY) {
+            q = (Node *)malloc(sizeof(Node));
+            s = (Node *)malloc(sizeof(Node));
+            q->adjvex = v0;
+            s->adjvex = v;
+            s->route = route;
+            p[v].next = q;
+            q->next = s;
+            s->next = NULL;
+        }
+    }
+    M[v0] = 0;
+    final[v0] = True;
+
+    for (i = 1; i < G.vexnum; i++) {
+        m = INFINITY;
+        v = -1;
+        for (w = 0; w < G.vexnum; w++) {
+            if (!final[w] && M[w] < m) {
+                v = w;
+                m = M[w];
+            }
+        }
+        if (v == v1) {
+            q = p[v].next;
+            r = q->next;
+            int start = (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0] * 60 + (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1];
+            int end = 0;
+            printf("行程路线是:\n");
+            while (r != NULL) {
+                if (k == 1) {
+                    printf("乘坐%s列车车次在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                } else {
+                    printf("乘坐%s飞机航班在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                }
+                if (r->next == NULL)
+                    end = (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].arrivetime[0] * 60 + (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].arrivetime[1];
+                q = r;
+                r = r->next;
+            }
+            int duration = end - start;
+            printf("最短时间是%d小时%d分钟\n\n", duration / 60, duration % 60);
+            for (v = 0; v < G.vexnum; v++) {
+                q = p[v].next;
+                while (q != NULL) {
+                    s = q;
+                    q = q->next;
+                    free(s);
+                }
+                p[v].next = NULL;
+            }
+            free(p);
+            return;
+        }
+        else if (v != -1) {
+            final[v] = True;
+            for (w = 0; w < G.vexnum; w++) {
+                if (!final[w] && arcs[v][w].last > -1) {
+                    MinTime(arcs[v][w], &time, &route);
+                    // 累加之前的最短时间到当前路径的时间上
+                    if (M[w] > M[v] + time) {
+                        M[w] = M[v] + time;
+                        q = p[w].next;
+                        while (q != NULL) {
+                            s = q;
+                            q = q->next;
+                            free(s);
+                        }
+                        q = &p[w];
+                        s = p[v].next;
+
+                        while (s != NULL) {
+                            r = (Node *)malloc(sizeof(Node));
+                            r->adjvex = s->adjvex;
+                            r->route = s->route;
+                            q->next = r;
+                            q = r;
+                            s = s->next;
+                        }
+
+                        r = (Node *)malloc(sizeof(Node));
+                        r->adjvex = w;
+                        r->route = route;
+                        r->next = NULL;
+                        q->next = r;
+
+                    }
+                }
+            }
+        }
+    }
+    // 输出最短路径
+    for (v = 0; v < G.vexnum; v++) {
+        q = p[v].next;
+        while (q != NULL) {
+            s = q;
+            q = q->next;
+            free(s);
+        }
+        p[v].next = NULL;
+    }
+    free(p);
+    if (k == 1) {
+        printf("不存在列车车次从%s到%s\n\n", G.vertices[v0].cityname, G.vertices[v1].cityname);
+    } else {
+        printf("不存在飞机航班从%s到%s\n\n", G.vertices[v0].cityname, G.vertices[v1].cityname);
+    }
+}
+
+
+// void TimeDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0, int v1, float *M, int *final, int T[MAX_VERTEX_NUM][2]) {
+//     int v = -1, w, i;
+//     float m, time;
+//     Node *p, *q, *r, *s;
+//     p = (Node *)malloc(G.vexnum * sizeof(Node));
+//     for (v = 0; v < G.vexnum; v++) {
+//         *(final + v) = False;
+//         MinTime(*(*(arcs + v0) + v), M + v, T[v]);
+//         p[v].next = NULL;
+//         if (*(M + v) < INFINITY) {
+//             q = (Node *)malloc(sizeof(Node));
+//             s = (Node *)malloc(sizeof(Node));
+//             q->adjvex = v0;
+//             s->adjvex = v;
+//             s->route = T[v][0];
+//             p[v].next = q;
+//             q->next = s;
+//             s->next = NULL;
+//         }
+//     }
+//     *(M + v0) = 0;
+//     *(final + v0) = True;
+//     for (i = 1; i < G.vexnum; i++) {
+//         m = INFINITY;
+//         v = -1;
+//         for (w = 0; w < G.vexnum; w++)
+//             if (*(final + w) == False && *(M + w) < m) {
+//                 v = w;
+//                 m = *(M + w);
+//             }
+//         if (v == v1) {
+//             q = p[v].next;
+//             r = q->next;
+//             printf("行程路线是:\n");
+//             while (r != NULL) {
+//                 if (k == 1)
+//                     printf("乘坐%s列车车次在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+//                 else
+//                     printf("乘坐%s飞机航班在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+//                 q = r;
+//                 r = r->next;
+//             }
+//             printf("最短时间是%d小时%d分钟\n\n", T[v][0], T[v][1]);
+//             break; // 找到最短路径后退出循环
+//         } else if (v != -1) {
+//             *(final + v) = True;
+//             for (w = 0; w < G.vexnum; w++)
+//                 if (*(final + w) == False && (*(*(arcs + v) + w)).last > -1) {
+//                     MinTime(*(*(arcs + v) + w), &time, T[w]);
+//                     if (*(M + w) > m + time) {
+//                         *(M + w) = m + time;
+//                         q = p[w].next;
+//                         while (q != NULL) {
+//                             s = q;
+//                             q = q->next;
+//                             free(s);
+//                         }
+//                         q = &p[w];
+//                         s = p[v].next;
+//                         while (s != NULL) {
+//                             r = (Node *)malloc(sizeof(Node));
+//                             r->adjvex = s->adjvex;
+//                             r->route = s->route;
+//                             q->next = r;
+//                             q = r;
+//                             s = s->next;
+//                         }
+//                         r = (Node *)malloc(sizeof(Node));
+//                         r->adjvex = w;
+//                         r->route = T[w][0];
+//                         r->next = NULL;
+//                         q->next = r;
+//                     }
+//                 }
+//         }
+//     }
+//     for (v = 0; v < G.vexnum; v++) {
+//         q = p[v].next;
+//         while (q != NULL) {
+//             s = q;
+//             q = q->next;
+//             free(s);
+//         }
+//         p[v].next = NULL;
+//     }
+//     free(p);
+//     if (v != v1) {
+//         if (k == 1)
+//             printf("不存在列车车次从%s到%s\n\n", G.vertices[v0].cityname, G.vertices[v1].cityname);
+//         else
+//             printf("不存在飞机航班从%s到%s\n\n", G.vertices[v0].cityname, G.vertices[v1].cityname);
+//     }
+// }
+
+
+// 最短时间处理
+// void TimeDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0, int v1, float *M, int *final, int T[MAX_VERTEX_NUM][2])
+// {
+//     int v = -1, w, i, route;
+//     float m, time;
+//     Node *p, *q, *r, *s;
+//     p = (Node *) malloc (G.vexnum * sizeof(Node));
+//     //遍历图中的每一个结点，标志未求城市的最短时间
+//     for(v = 0; v < G.vexnum; v++)
+//     {
+//         *(final + v) = False;  //城市v还未求得最短时间
+//         //调用函数求得城市v0到v的最短时间
+//         MinTime(*(*(arcs + v0) + v), M + v, T[v]);
+//         p[v].next = NULL;     //将城市v的路径设置为空
+//         //如果求得的时间小于设置的初始值，则将城市v0和v加入到城市v的路径中
+//         if(*(M + v) < INFINITY)
+//         {
+//             q = (Node *) malloc (sizeof(Node)); 
+//             s = (Node *) malloc (sizeof(Node));
+//             q->adjvex = v0;
+//             s->adjvex = v;
+//             s->route = T[v][0];
+//             p[v].next = q;
+//             q->next = s;
+//             s->next = NULL;
+//         }                          
+//     }
+//     *(M + v0) = 0;        // 城市v0到城市v0的最短时间为0
+//     *(final + v0) = True; //城市v0设为已求得最短时间
+//     //遍历图中除vo的所有结点
+//     for(i = 1; i < G.vexnum; i++)
+//     {
+//         m = INFINITY;
+//         v = -1;
+//         //找到未求最短时间的节点中，时间最小的城市结点v
+//         for(w = 0; w < G.vexnum; w++)
+//             if(*(final + w) == False
+
+//                 && *(M + w) < m)
+//             {
+//                 v = w;
+//                 m = *(M + w);
+//             }
+//         //v等于v1，则表示v0到v1直达的时间最短
+//         if(v == v1)
+//         {
+//             q = p[v].next;
+//             r = q->next;
+//             printf("行程路线是:\n");
+//             while(r != NULL)
+//             {
+//                 if(k == 1)
+//                     printf("乘坐%s列车车次在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+//                 else
+//                     printf("乘坐%s飞机航班在%02d:%02d从%s到%s\n", (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].number, (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[0], (*(*(arcs + q->adjvex) + r->adjvex)).stata[r->route].begintime[1], G.vertices[q->adjvex].cityname, G.vertices[r->adjvex].cityname);
+                
+//                 q = r;
+//                 r = r->next;
+//             }
+//             printf("最短时间是%d小时%d分钟\n\n", T[v][0], T[v][1]);
+//             for(v = 0; v < G.vexnum; v++)
+//             {
+//                 q = p[v].next;
+//                 while(q != NULL)
+//                 {
+//                     s = q;
+//                     q = q->next;
+//                     free(s);
+//                 }
+//                 p[v].next = NULL;
+//             }
+//             free(p);
+//             return;
+//         }
+//         else if(v != -1)
+//         {
+//             *(final + v) = True;   //将城市v设为已求得最短时间
+//             //遍历图中的每一个结点
+//             for(w = 0; w < G.vexnum; w++)
+//                 if(*(final + w) == False && (*(*(arcs + v) + w)).last > -1)
+//                 {
+//                     //找到从v到v1最短时间的路径
+//                     MinTime(*(*(arcs + v) + w), &time, T[w]);
+//                     if(*(M + w) > m + time)
+//                     {
+//                         *(M + w) = m + time;
+//                         q = p[w].next;
+                        
+//                         while(q != NULL)
+//                         {
+//                             s = q;
+//                             q = q->next;
+//                             free(s);
+//                         }
+//                         q = &p[w];
+//                         s = p[v].next;
+                        
+//                         while(s != NULL)
+//                         {
+//                             r = (Node *) malloc (sizeof(Node));
+//                             r->adjvex = s->adjvex;
+//                             r->route = s->route;
+//                             q->next = r;
+//                             q = r;
+//                             s = s->next;
+//                         }
+                        
+//                         r = (Node *) malloc (sizeof(Node));
+//                         r->adjvex = w;
+//                         r->route = T[w][0];
+//                         r->next = NULL;
+//                         q->next = r;
+//                     }//if
+//                 }//if
+//         }//else
+//     }//for
+//     //释放掉占用的空间
+//     for(v = 0; v < G.vexnum; v++)
+//     {
+//         q = p[v].next;
+//         while(q != NULL)
+//         {
+//             s = q;
+//             q = q->next;
+//             free(s);
+//         }
+//         p[v].next = NULL;
+//     }
+//     free(p);
+//     //最后没找到符合条件的路径，则输出提示信息
+//     if(k == 1)
+//         printf("不存在列车车次从%s到%s\n\n", G.vertices[v0].cityname, G.vertices[v1].cityname);
+//     else
+//         printf("不存在飞机航班从%s到%s\n\n", G.vertices[v0].cityname, G.vertices[v1].cityname);
+// }
+
+// //两直达城市之间最短时间和相应路径
+
+// void MinTime(infolist arcs, float *time, int T[2])
+// {
+//     int i;
+//     *time = arcs.stata[0].arrivetime[0] * 60 + arcs.stata[0].arrivetime[1] - arcs.stata[0].begintime[0] * 60 - arcs.stata[0].begintime[1];
+//     T[0] = arcs.stata[0].arrivetime[0] - arcs.stata[0].begintime[0];
+//     T[1] = arcs.stata[0].arrivetime[1] - arcs.stata[0].begintime[1];
+//     if(*time < 0)
+//         *time += 24 * 60;
+//     if(*time < 0)
+//         *time = 0;
+//     if(*time < INFINITY)
+//         T[0] = arcs.stata[0].arrivetime[0] - arcs.stata[0].begintime[0];
+//     if(*time < INFINITY)
+//         T[1] = arcs.stata[0].arrivetime[1] - arcs.stata[0].begintime[1];
+//     if(*time < INFINITY)
+//         T[0] = arcs.stata[0].arrivetime[0] - arcs.stata[0].begintime[0];
+//     if(*time < INFINITY)
+//         T[1] = arcs.stata[0].arrivetime[1] - arcs.stata[0].begintime[1];
+//     for(i = 1; i <= arcs.last; i++)
+//     {
+//         if(arcs.stata[i].arrivetime[0] * 60 + arcs.stata[i].arrivetime[1] - arcs.stata[i].begintime[0] * 60 - arcs.stata[i].begintime[1] < 0)
+//             arcs.stata[i].arrivetime[0] += 24;
+//         if(arcs.stata[i].arrivetime[0] * 60 + arcs.stata[i].arrivetime[1] - arcs.stata[i].begintime[0] * 60 - arcs.stata[i].begintime[1] < *time)
+//         {
+//             *time = arcs.stata[i].arrivetime[0] * 60 + arcs.stata[i].arrivetime[1] - arcs.stata[i].begintime[0] * 60 - arcs.stata[i].begintime[1];
+//             T[0] = arcs.stata[i].arrivetime[0] - arcs.stata[i].begintime[0];
+//             T[1] = arcs.stata[i].arrivetime[1] - arcs.stata[i].begintime[1];
+//         }
+//     }
+// }
+
