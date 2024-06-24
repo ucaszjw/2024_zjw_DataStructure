@@ -659,7 +659,6 @@ void cityedit(ALGraph *G)
         printf("请输入删除城市的名称:");
         scanf("%s", v);
         i = LocateVertex(G, v);
-        printf("i=%d\n", i);
         //若城市不存在 
         if(i == -1)
         {
@@ -671,12 +670,10 @@ void cityedit(ALGraph *G)
             printf("确认?(Y/N)");
             getchar();
             c = getchar();
-            printf("c=%c\n", c);
-            
-            printf("-1");
+            getchar();
+
             if(c == 'Y' || c == 'y')
             {
-                printf("0");
                 //将从该城市出发的车次和航班删除
                 ArcNode *p, *q;
                 p = G->vertices[i].planefirstarc;
@@ -686,7 +683,6 @@ void cityedit(ALGraph *G)
                     p = p->nextarc;
                     free(q);
                 }
-                printf("1");
 
                 p = G->vertices[i].trainfirstarc;
                 while(p != NULL)
@@ -695,33 +691,47 @@ void cityedit(ALGraph *G)
                     p = p->nextarc;
                     free(q);
                 }
-                printf("2");
 
                 //将到达该城市的车次和航班删除
                 for(int j = 0; j < G->vexnum; j++)
                 {
+                    ArcNode *prev = NULL;
                     p = G->vertices[j].planefirstarc;
                     while(p != NULL)
                     {
                         if(p->adjvex == i)
                         {
+                            if(prev == NULL) { // 如果要删除的是第一个节点
+                                G->vertices[j].planefirstarc = p->nextarc;
+                            } else {
+                                prev->nextarc = p->nextarc;
+                            }
                             q = p;
                             p = p->nextarc;
                             free(q);
+                        } else {
+                            prev = p;
+                            p = p->nextarc;
                         }
                     }
-                    printf("3");
                     p = G->vertices[j].trainfirstarc;
                     while(p != NULL)
                     {
                         if(p->adjvex == i)
                         {
+                            if(prev == NULL) { // 如果要删除的是第一个节点
+                                G->vertices[j].trainfirstarc = p->nextarc;
+                            } else {
+                                prev->nextarc = p->nextarc;
+                            }
                             q = p;
                             p = p->nextarc;
                             free(q);
+                        } else {
+                            prev = p;
+                            p = p->nextarc;
                         }
                     }
-                    printf("4");
                 }
                 //将城市名称删除 
                 for(int j = i; j < G->vexnum - 1; j++)
@@ -798,8 +808,8 @@ void flight_trainedit(ALGraph *G, int flag)
                 getchar();
             }
             printf("确认?(Y/N)");
-            getchar();
             c = getchar();
+            getchar();
             //将输入的信息存储到图中 
             if(c == 'Y' || c == 'y')
             {
@@ -925,8 +935,8 @@ void flight_trainedit(ALGraph *G, int flag)
             return;
         }
         printf("确认?(Y/N)");
-        getchar();
         c = getchar();
+        getchar();
         if(c == 'Y' || c == 'y')
         {
             for(t = 0; t <= q->info.last; t++)
@@ -934,7 +944,10 @@ void flight_trainedit(ALGraph *G, int flag)
                 if(strcmp(q->info.stata[t].number, code) == 0)
                 {
                     for(m = t; m < q->info.last; m++)
+                    {
                         q->info.stata[m] = q->info.stata[m + 1];
+
+                    }
                     q->info.last--;
                     break;
                 }
@@ -1555,6 +1568,7 @@ void TimeDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int v0, int
             }
         }
     }
+    
     // 输出最短路径
     for (v = 0; v < G.vexnum; v++) {
         q = p[v].next;
