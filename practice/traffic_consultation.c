@@ -2,11 +2,11 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define MAX_VERTEX_NUM 18
-#define MAX_ARC_SIZE 100
+#define MAX_VERTEX_NUM 50
+#define MAX_ARC_SIZE 200
 #define MAX_ROUTE_NUM 5
 #define MAX_CITY_NAME_LEN 15
-#define MAX_TRANSPORT_ID_LEN 6
+#define MAX_TRANSPORT_ID_LEN 8
 #define False 0
 #define True 1
 #define INFINITY 10000000
@@ -220,7 +220,7 @@ void createcityfile()
         return;
     }
     for(j = 0; j < i; j++)
-        fprintf(fp, "%s \n", city[j]);
+        fprintf(fp, "%s\n", city[j]);
     fclose(fp);
 }
 
@@ -646,7 +646,7 @@ void cityedit(ALGraph *G)
 void flight_trainedit(ALGraph *G, int flag)
 {
     int i, j, BeginTime[2], ArriveTime[2], m, t;
-    char code[5];
+    char code[MAX_CITY_NAME_LEN];
     float money;
     char StartCity[10], EndCity[10], c;
     ArcNode *p, *q;
