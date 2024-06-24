@@ -501,6 +501,7 @@ void CreateGraph(ALGraph *G)
         k++;
     }
     G->trainarcnum = arc_num;
+    printf("城市交通系统初始化成功！\n");
 }
 
 //保存城市交通系统到相应的文档
@@ -613,7 +614,7 @@ void cityedit(ALGraph *G)
 {
     int operation;
     printf("-------------------------------------------------------\n");
-    printf("|    0=添加城市             1=删除城市                 |\n");
+    printf("|    0=添加城市             1=删除城市                |\n");
     printf("|    2=返回上一级菜单                                 |\n");
     printf("-------------------------------------------------------\n");
     printf("请选择管理项目: ");
@@ -738,6 +739,7 @@ void cityedit(ALGraph *G)
                     G->vertices[j] = G->vertices[j + 1];
                 G->vexnum--;
                 save(G);
+                printf("城市删除成功!\n");
             }
             else
                 return;
@@ -759,127 +761,127 @@ void flight_trainedit(ALGraph *G, int flag)
     scanf("%d", &operation);
     getchar();
     if(operation == 0)
+    {
+        int i, j, BeginTime[2], ArriveTime[2], m, t;
+        char code[MAX_CITY_NAME_LEN];
+        float money;
+        char StartCity[10], EndCity[10], c;
+        ArcNode *p, *q;
+        //提示用户输入信息
+        if (flag == 1)
         {
-            int i, j, BeginTime[2], ArriveTime[2], m, t;
-            char code[MAX_CITY_NAME_LEN];
-            float money;
-            char StartCity[10], EndCity[10], c;
-            ArcNode *p, *q;
-            //提示用户输入信息
-            if (flag == 1)
-            {
-                printf("请输入新增飞机航班的信息:\n");
-                printf("飞机航班编号:");
-            }
-            else
-            {
-                printf("请输入新增列车车次的信息:\n");
-                printf("列车车次编号:");
-            }
-            scanf("%s", code);
-            getchar();
-            printf("起始城市:");
-            scanf("%s", StartCity);
-            printf("目的城市:");
-            scanf("%s", EndCity);
-            if (flag == 1)
-                printf("航班费用:");
-            else
-                printf("车次费用:");
-            scanf("%f", &money);
-            getchar();
-            printf("起始时间:");
+            printf("请输入新增飞机航班的信息:\n");
+            printf("飞机航班编号:");
+        }
+        else
+        {
+            printf("请输入新增列车车次的信息:\n");
+            printf("列车车次编号:");
+        }
+        scanf("%s", code);
+        getchar();
+        printf("起始城市:");
+        scanf("%s", StartCity);
+        printf("目的城市:");
+        scanf("%s", EndCity);
+        if (flag == 1)
+            printf("航班费用:");
+        else
+            printf("车次费用:");
+        scanf("%f", &money);
+        getchar();
+        printf("起始时间:");
+        scanf("%d:%d", &BeginTime[0], &BeginTime[1]);
+        getchar();
+        //判断输入时间是否合理 
+        while(BeginTime[0] < 0 || BeginTime[0] >= 24 || BeginTime[1] < 0 || BeginTime[1] >= 60)
+        {
+            printf("时间输入有误，请重新输入\n");
             scanf("%d:%d", &BeginTime[0], &BeginTime[1]);
             getchar();
-            //判断输入时间是否合理 
-            while(BeginTime[0] < 0 || BeginTime[0] >= 24 || BeginTime[1] < 0 || BeginTime[1] >= 60)
-            {
-                printf("时间输入有误，请重新输入\n");
-                scanf("%d:%d", &BeginTime[0], &BeginTime[1]);
-                getchar();
-            }
-            printf("到达时间:");
+        }
+        printf("到达时间:");
+        scanf("%d:%d", &ArriveTime[0], &ArriveTime[1]);
+        getchar();
+        while(ArriveTime[0] < 0 || ArriveTime[0] >= 24 || ArriveTime[1] < 0 || ArriveTime[1] >= 60)
+        {
+            printf("时间输入有误，请重新输入\n");
             scanf("%d:%d", &ArriveTime[0], &ArriveTime[1]);
             getchar();
-            while(ArriveTime[0] < 0 || ArriveTime[0] >= 24 || ArriveTime[1] < 0 || ArriveTime[1] >= 60)
-            {
-                printf("时间输入有误，请重新输入\n");
-                scanf("%d:%d", &ArriveTime[0], &ArriveTime[1]);
-                getchar();
-            }
-            printf("确认?(Y/N)");
-            c = getchar();
-            getchar();
-            //将输入的信息存储到图中 
-            if(c == 'Y' || c == 'y')
-            {
-                i = LocateVertex(G, StartCity);
-                j = LocateVertex(G, EndCity);
-                if(i == -1)
-                {
-                    printf("错误！无法找到起始城市\n");
-                    return;
-                }
-                if(j == -1)
-                {
-                    printf("错误！无法找到到达城市\n");
-                    return;
-                }
-                //判断是飞机航班还是列车车次 
-                if (flag == 1)
-                    q = G->vertices[i].planefirstarc;
-                if (flag == 2)
-                    q = G->vertices[i].trainfirstarc;
-                m = 0;
-                while(q != NULL)
-                {
-                    //如果到达城市相同 
-                    if(q->adjvex == j)
-                    {
-                        t = q->info.last + 1;
-                        strcpy(q->info.stata[t].number, code);
-                        q->info.stata[t].expenditure = money;
-                        q->info.stata[t].begintime[0] = BeginTime[0];
-                        q->info.stata[t].begintime[1] = BeginTime[1];
-                        q->info.stata[t].arrivetime[0] = ArriveTime[0];
-                        q->info.stata[t].arrivetime[1] = ArriveTime[1];
-                        q->info.last = t;
-                        m = 1;
-                        break;
-                    }
-                    q = q->nextarc;
-                }
-                if(m == 0)
-                {
-                    p = (ArcNode*)malloc(sizeof(ArcNode));
-                    p->adjvex = j;
-                    strcpy(p->info.stata[0].number, code);
-                    p->info.stata[0].expenditure = money;
-                    p->info.stata[0].begintime[0] = BeginTime[0];
-                    p->info.stata[0].begintime[1] = BeginTime[1];
-                    p->info.stata[0].arrivetime[0] = ArriveTime[0];
-                    p->info.stata[0].arrivetime[1] = ArriveTime[1];
-                    p->info.last = 0;
-                    //将结点p添加到交通图中 
-                    if (flag == 1)
-                    {
-                        p->nextarc = G->vertices[i].planefirstarc;
-                        G->vertices[i].planefirstarc = p;
-                        G->planearcnum++;
-                    }
-                    if (flag == 2)
-                    {
-                        p->nextarc = G->vertices[i].trainfirstarc;
-                        G->vertices[i].trainfirstarc = p;
-                        G->trainarcnum++;
-                    }
-                }
-                save(G);
-            }
-            else
-                return;
-
         }
+        printf("确认?(Y/N)");
+        c = getchar();
+        getchar();
+        //将输入的信息存储到图中 
+        if(c == 'Y' || c == 'y')
+        {
+            i = LocateVertex(G, StartCity);
+            j = LocateVertex(G, EndCity);
+            if(i == -1)
+            {
+                printf("错误！无法找到起始城市\n");
+                return;
+            }
+            if(j == -1)
+            {
+                printf("错误！无法找到到达城市\n");
+                return;
+            }
+            //判断是飞机航班还是列车车次 
+            if (flag == 1)
+                q = G->vertices[i].planefirstarc;
+            if (flag == 2)
+                q = G->vertices[i].trainfirstarc;
+            m = 0;
+            while(q != NULL)
+            {
+                //如果到达城市相同 
+                if(q->adjvex == j)
+                {
+                    t = q->info.last + 1;
+                    strcpy(q->info.stata[t].number, code);
+                    q->info.stata[t].expenditure = money;
+                    q->info.stata[t].begintime[0] = BeginTime[0];
+                    q->info.stata[t].begintime[1] = BeginTime[1];
+                    q->info.stata[t].arrivetime[0] = ArriveTime[0];
+                    q->info.stata[t].arrivetime[1] = ArriveTime[1];
+                    q->info.last = t;
+                    m = 1;
+                    break;
+                }
+                q = q->nextarc;
+            }
+            if(m == 0)
+            {
+                p = (ArcNode*)malloc(sizeof(ArcNode));
+                p->adjvex = j;
+                strcpy(p->info.stata[0].number, code);
+                p->info.stata[0].expenditure = money;
+                p->info.stata[0].begintime[0] = BeginTime[0];
+                p->info.stata[0].begintime[1] = BeginTime[1];
+                p->info.stata[0].arrivetime[0] = ArriveTime[0];
+                p->info.stata[0].arrivetime[1] = ArriveTime[1];
+                p->info.last = 0;
+                //将结点p添加到交通图中 
+                if (flag == 1)
+                {
+                    p->nextarc = G->vertices[i].planefirstarc;
+                    G->vertices[i].planefirstarc = p;
+                    G->planearcnum++;
+                }
+                if (flag == 2)
+                {
+                    p->nextarc = G->vertices[i].trainfirstarc;
+                    G->vertices[i].trainfirstarc = p;
+                    G->trainarcnum++;
+                }
+            }
+            save(G);
+            printf("添加成功!\n");
+        }
+        else
+            return;
+    }
     else if(operation == 1)
     {
         char code[MAX_TRANSPORT_ID_LEN], c;
@@ -953,6 +955,7 @@ void flight_trainedit(ALGraph *G, int flag)
                 }
             }
             save(G);
+            printf("删除成功!\n");
         }
     }
     else
