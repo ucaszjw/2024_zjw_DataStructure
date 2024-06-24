@@ -366,7 +366,7 @@ void CreateGraph(ALGraph *G)
     //打开plane.txt文档 
     if((fp = fopen("plane.txt", "r")) == NULL)
     {
-        printf("cannot open the file!\n");
+        printf("cannot open plane.txt!\n");
         return;
     }
     fscanf(fp, "%d", &count1);
@@ -374,7 +374,7 @@ void CreateGraph(ALGraph *G)
     while(k < count1)
     {
         if(fread(&a[k], sizeof(struct arc), 1, fp) != 1)
-            printf("file open error!\n");
+            printf("plane.txt open error!\n");
         k++;
     }
     fclose(fp);
@@ -434,7 +434,7 @@ void CreateGraph(ALGraph *G)
     //打开train.txt文档 
     if((fp = fopen("train.txt","r")) == NULL)
     {
-        printf("cannot open the file!\n");
+        printf("cannot open train.txt!\n");
         return;
     }
     k = 0;
@@ -443,7 +443,7 @@ void CreateGraph(ALGraph *G)
     while(k < count2)
     {
         if(fread(&a[k], sizeof(struct arc), 1, fp) != 1)
-            printf("file open error!\n");
+            printf("train.txt open error!\n");
         k++;
     }
     fclose(fp);
@@ -848,7 +848,7 @@ void DemandDispose(int n, ALGraph G)
     //打印所有城市，并提示用户选择起始城市和到达城市 
     printf("该交通图中所有城市及编号如下所示：\n");
     for(k = 0; k < G.vexnum; k++)
-        printf("%3d=%10s\n", k, G.vertices[k].cityname);
+        printf("%3d=%s\n", k, G.vertices[k].cityname);
     printf("请选择行程起始城市: ");
     scanf("%d", &i);
     printf("请选择行程到达城市: ");
@@ -949,7 +949,7 @@ void ExpenditureDispose(int k, infolist (*arcs)[MAX_VERTEX_NUM], ALGraph G, int 
                 q = r;
                 r = r->next;
             }
-            printf("最少旅行费用是%f元\n\n", m);
+            printf("最少旅行费用是%5.2f元\n\n", m);
             for(v = 0; v < G.vexnum; v++)
             {
                 q = p[v].next;
