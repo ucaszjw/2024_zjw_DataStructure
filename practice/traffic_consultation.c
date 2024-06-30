@@ -19,7 +19,7 @@ struct arc
     int BeginTime[2];
     int ArriveTime[2];
     float price;
-}a[MAX_ARC_SIZE]; //临时存放飞机或列车信息
+}a[MAX_ARC_SIZE]; //临时存放飞机或列车信息，用于初始化交通系统
 
 typedef struct
 {
@@ -33,20 +33,20 @@ typedef struct
 {
     Vehide stata[MAX_ROUTE_NUM];
     int last;
-}infolist;
+}infolist; //记录每一个弧的信息
 
 typedef struct ArcNode
 {
     int adjvex;
     struct ArcNode *nextarc;
     infolist info;
-}ArcNode;
+}ArcNode; //弧结点
 
 typedef struct VNode
 {
     char cityname[MAX_CITY_NAME_LEN];
     ArcNode *planefirstarc, *trainfirstarc;
-}VNode,AdjList[MAX_VERTEX_NUM];
+}VNode,AdjList[MAX_VERTEX_NUM]; //邻接表
 
 typedef struct
 {
@@ -59,20 +59,20 @@ typedef struct Node
     int adjvex;
     int route;
     struct Node *next;
-}Node;
-
+}Node; //记录满足用户要求的路径
 typedef struct QNode
 {
     int adjvex;
     struct QNode *next;
-}QNode;
+}QNode; //链队列结点
 
 typedef struct
 {
     QNode *front;
     QNode *rear;
-}LinkQueue;
-char city[MAX_VERTEX_NUM][MAX_CITY_NAME_LEN];
+}LinkQueue; //链队列的头尾指针
+
+char city[MAX_VERTEX_NUM][MAX_CITY_NAME_LEN]; //存放城市名称
 
 void Administer(ALGraph *G); //显示管理员管理项目选择界面
 void initgraph(ALGraph *G); //初始化交通系统
